@@ -85,7 +85,7 @@ export const orders: Order[] = [
         zip: '12345',
       },
       items: [
-        { product: { id: 1, name: 'Pineapple Jam', price: 5.99, rating: 4.8, imageUrl: 'https://picsum.photos/seed/pineapplejam/400/300', description: '', stock: 0, isFeatured: false, salePrice: undefined }, quantity: 2 },
+        { product: { id: 1, name: 'Pineapple Jam', price: 5.99, imageUrl: 'https://picsum.photos/seed/pineapplejam/400/300', description: '', stock: 0, isFeatured: false, salePrice: undefined }, quantity: 2 },
       ],
       total: 16.98,
       shippingCost: 5.00,
@@ -130,11 +130,10 @@ export const updateProduct = (updatedProduct: Product): void => {
     }
 };
 
-export const addProduct = (newProductData: Omit<Product, 'id' | 'rating'>): Product => {
+export const addProduct = (newProductData: Omit<Product, 'id'>): Product => {
     const newProduct: Product = {
         ...newProductData,
         id: Date.now(),
-        rating: 0, // New products start with 0 rating
     };
     products = [newProduct, ...products];
     saveProducts();

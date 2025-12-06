@@ -9,7 +9,7 @@ import LoginModal from './components/LoginModal';
 import AccountPage from './components/AccountPage';
 import { ToastContainer } from './components/Toast';
 import { BLOG_POSTS as INITIAL_BLOG_POSTS } from './constants';
-import { Product, CartItem, Order, Feedback, CustomerDetails, User, BlogPost, PaymentSettings, ToastMessage } from './types';
+import { Product, CartItem, Order, CustomerDetails, User, BlogPost, PaymentSettings, ToastMessage } from './types';
 import { userDB, orders as dbOrders, getOrdersByUserId, getAllProducts, updateProduct as dbUpdateProduct, addProduct as dbAddProduct } from './db';
 
 const App: React.FC = () => {
@@ -21,7 +21,6 @@ const App: React.FC = () => {
     const savedOrders = localStorage.getItem('pine_store_orders');
     return savedOrders ? JSON.parse(savedOrders, (key, value) => key === 'date' ? new Date(value) : value) : dbOrders;
   });
-  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [view, setView] = useState<'products' | 'checkout' | 'blog' | 'admin' | 'account'>('products');
   const [paymentSettings, setPaymentSettings] = useState<PaymentSettings>(() => {
@@ -188,27 +187,13 @@ const App: React.FC = () => {
     setCart([]);
   };
   
-  const handleAddFeedback = (productId: number, rating: number) => {
-      const product = products.find(p => p.id === productId);
-      if (!product) return;
-
-      const newFeedback: Feedback = {
-          id: Date.now(),
-          productId,
-          productName: product.name,
-          rating,
-          date: new Date(),
-      };
-      setFeedbacks(prev => [newFeedback, ...prev]);
-  };
-  
   // Admin Handlers
   const handleUpdateProduct = (updatedProduct: Product) => {
     dbUpdateProduct(updatedProduct);
     setProducts(products => products.map(p => p.id === updatedProduct.id ? updatedProduct : p));
   };
   
-  const handleAddProduct = (newProductData: Omit<Product, 'id' | 'rating'>) => {
+  const handleAddProduct = (newProductData: Omit<Product, 'id'>) => {
       const newProduct = dbAddProduct(newProductData);
       setProducts(prev => [newProduct, ...prev]);
   }
@@ -271,7 +256,6 @@ const App: React.FC = () => {
         return isAdmin ? <AdminDashboard 
                             products={products}
                             orders={orders}
-                            feedbacks={feedbacks}
                             blogPosts={blogPosts}
                             paymentSettings={paymentSettings}
                             onUpdateProduct={handleUpdateProduct}
@@ -291,15 +275,7 @@ const App: React.FC = () => {
         const filteredProducts = products.filter(p => p.name.toLowerCase().includes(lowercasedSearchTerm));
 
         const featuredProducts = filteredProducts.filter(p => p.isFeatured);
-        
-        const topRatedProducts = [...products]
-            .sort((a, b) => b.rating - a.rating)
-            .slice(0, 4)
-            .filter(p => !p.isFeatured && p.name.toLowerCase().includes(lowercasedSearchTerm));
-        
-        const topRatedIds = topRatedProducts.map(p => p.id);
-
-        const regularProducts = filteredProducts.filter(p => !p.isFeatured && !topRatedIds.includes(p.id));
+        const regularProducts = filteredProducts.filter(p => !p.isFeatured);
 
         return (
           <main className="container mx-auto px-4 py-12">
@@ -310,21 +286,7 @@ const App: React.FC = () => {
                         {featuredProducts.map((product) => (
                             <ProductCard 
                                 key={product.id} product={product} onAddToCart={handleAddToCart}
-                                onAddRating={handleAddFeedback} currentUser={currentUser} onLoginClick={() => setIsLoginModalOpen(true)}
-                            />
-                        ))}
-                    </div>
-                </section>
-            )}
-
-            {topRatedProducts.length > 0 && (
-                <section className="mb-16">
-                    <h2 className="text-3xl font-bold text-center text-green-800 mb-8 border-b-2 border-yellow-200 pb-2">Top Rated</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {topRatedProducts.map((product) => (
-                            <ProductCard
-                                key={product.id} product={product} onAddToCart={handleAddToCart}
-                                onAddRating={handleAddFeedback} currentUser={currentUser} onLoginClick={() => setIsLoginModalOpen(true)}
+                                currentUser={currentUser} onLoginClick={() => setIsLoginModalOpen(true)}
                             />
                         ))}
                     </div>
@@ -333,14 +295,14 @@ const App: React.FC = () => {
 
             <section>
                 <h2 className="text-3xl font-bold text-center text-green-800 mb-8 border-b-2 border-yellow-200 pb-2">
-                    {featuredProducts.length > 0 || topRatedProducts.length > 0 ? 'All Products' : 'Our Products'}
+                    {featuredProducts.length > 0 ? 'All Products' : 'Our Products'}
                 </h2>
                 {regularProducts.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                         {regularProducts.map((product) => (
                             <ProductCard 
                             key={product.id} product={product} onAddToCart={handleAddToCart}
-                            onAddRating={handleAddFeedback} currentUser={currentUser} onLoginClick={() => setIsLoginModalOpen(true)}
+                            currentUser={currentUser} onLoginClick={() => setIsLoginModalOpen(true)}
                             />
                         ))}
                     </div>

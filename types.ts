@@ -4,7 +4,6 @@ export interface Product {
   price: number;
   salePrice?: number;
   isFeatured?: boolean;
-  rating: number;
   imageUrl: string;
   description: string;
   stock: number;
@@ -46,14 +45,6 @@ export interface Order {
   paymentMethod: 'Credit Card' | 'UPI';
   isComplete: boolean;
   userId?: number;
-}
-
-export interface Feedback {
-  id: number;
-  productId: number;
-  productName: string;
-  rating: number;
-  date: Date;
 }
 
 export interface User {

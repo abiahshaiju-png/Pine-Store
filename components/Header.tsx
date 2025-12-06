@@ -80,7 +80,7 @@ const Header: React.FC<HeaderProps> = ({ cartCount, onCartClick, onNavigate, isA
         </div>
       </div>
       
-      <p className="text-2xl text-amber-600 -mt-2 font-['Pacifico',_cursive]">Farm fresh ready to Serve</p>
+      <p className="text-2xl text-amber-600 -mt-2 font-['Pacifico',_cursive]">Farm-Fresh: Ready to Serve</p>
 
       <div className="w-full max-w-2xl mx-auto">
         <div className="relative">
